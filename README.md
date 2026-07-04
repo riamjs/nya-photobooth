@@ -1,2 +1,1 @@
 # Photobooth
-# Photobooth - Mini Project
