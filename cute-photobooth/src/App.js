@@ -2,7 +2,7 @@ import './App.css';
 import React from "react";
 import Photobooth from "./components/photobooth";
 import "./styles/global.css";
-const logoSrc = "public/assets/logo/nya_pb_logo.PNG";
+const logoSrc = "/assets/logo/nya_pb_logo.png";
 
 
 function App() {
