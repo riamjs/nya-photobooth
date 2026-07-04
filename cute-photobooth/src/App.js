@@ -28,7 +28,7 @@ function App() {
           margin: 0,
           fontSize: "clamp(20px, 5vw, 32px)"
         }}>
-          Nya Photobooth!!!
+          Nya Photobooth!!! 
         </h1>
       </div>
 

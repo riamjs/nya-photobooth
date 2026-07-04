@@ -10,7 +10,12 @@ const stickerOptions = [
     "/assets/stickers/sparkles.png"
 ];
 
-const videoConstraints = { width: 953, height: 599, facingMode: "user" };
+const videoConstraints = {
+    width: { ideal: 953 },
+    height: { ideal: 599 },
+    aspectRatio: { ideal: 953 / 599 },
+    facingMode: "user"
+};
 const SLOT_WIDTH = 648;
 const SLOT_HEIGHT = 378;
 
@@ -412,9 +417,14 @@ export default function PhotoBooth() {
                 .pb-webcam-wrap {
                     position: relative;
                     width: 100%;
+                    aspect-ratio: 953 / 599;
+                    overflow: hidden;
+                    border-radius: 12px;
                 }
                 .pb-webcam-wrap video {
                     width: 100%;
+                    height: 100%;
+                    object-fit: cover;
                     border-radius: 12px;
                     display: block;
                 }
