@@ -474,7 +474,7 @@ export default function PhotoBooth() {
                 }
 
                 .pb-btn {
-                    font-famaily: Cantika Cute Handwriting;
+                    font-family: "CantikaCute";
                     padding: 10px 20px;
                     font-size: clamp(15px, 3.5vw, 20px);
                     cursor: pointer;
