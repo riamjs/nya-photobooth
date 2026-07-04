@@ -28,13 +28,10 @@ export default function Photobooth() {
 
     const slots = [
         { x: 123, y: 78 },
-        { x: 123, y: 697 },
+        { x: 123, y: 687 },
         { x: 123, y: 1286 },
         { x: 123, y: 1885 }
     ];
-
-    const [selectedFrame, setSelectedFrame] = useState(null);
-
 
 
 }
