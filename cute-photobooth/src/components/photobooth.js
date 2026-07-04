@@ -40,8 +40,7 @@ export default function PhotoBooth() {
     const [stickers, setStickers] = useState([]);
     const [draggingSticker, setDraggingSticker] = useState(null);
     const [selectedSticker, setSelectedSticker] = useState(null);
-    const row = { display: "flex", gap: 40, alignItems: "flex-start" };
-
+    
     // useEffects
 
     // frames
@@ -54,7 +53,7 @@ export default function PhotoBooth() {
             frameImgRef.current = img;
             drawCanvas();
         }
-    }, [selectedFrame]);
+    }, [selectedFrame]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const drawCanvas = () => {
         const canvas = canvasRef.current;
@@ -98,7 +97,7 @@ export default function PhotoBooth() {
     useEffect(drawCanvas, [photos, stickers, selectedSticker, photoCount]);
 
     const handleBack = () => {
-        if (mode == "decorate") {
+        if (mode === "decorate") {
             setMode("photo");
             setCanTakePhoto(false);
             setStickers([]);
@@ -126,7 +125,7 @@ export default function PhotoBooth() {
 
         setPhotos(p => [
             ...p,
-            { img, slotIndex: photoCount, scale, offsetX: 0, offsetY }
+            { img, slotIndex: photoCount, scale, offsetX, offsetY }
         ]);
 
         setCanTakePhoto(true);
@@ -290,14 +289,14 @@ export default function PhotoBooth() {
                 selectedSticker != null &&
                 mode === "decorate"
             ){
-                setStickers(s => s.filter((_,i) => i != selectedSticker));
+                setStickers(s => s.filter((_,i) => i !== selectedSticker));
                 setSelectedSticker(null);
             }
         };
 
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [selectedSticker,mode]);
+    }, [selectedSticker, mode]); // eslint-disable-line react-hooks/exhaustive-deps
 
     //download
 
