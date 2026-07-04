@@ -20,14 +20,13 @@ const SLOT_HEIGHT = 378;
     { x: 85, y: 878 },
     { x: 87, y: 1293 },
     ];
-    
+
 export default function PhotoBooth() {
     const webcamRef = useRef(null);
     const canvasRef = useRef(null);
     const frameImgRef = useRef(null);
 
    
-
     const [selectedFrame, setSelectedFrame] = useState(null);
     const [mode, setMode] = useState("photo");
 
@@ -41,10 +40,8 @@ export default function PhotoBooth() {
     const [stickers, setStickers] = useState([]);
     const [draggingSticker, setDraggingSticker] = useState(null);
     const [selectedSticker, setSelectedSticker] = useState(null);
-    
-    // useEffects
 
-    // frames
+    
     useEffect(() => {
         if (!selectedFrame) return;
         const img = new Image();
@@ -66,6 +63,9 @@ export default function PhotoBooth() {
         const frameHeight = frameImgRef.current.height;
         canvas.width = frameWidth;
         canvas.height = frameHeight;
+
+
+        canvas.style.aspectRatio = `${frameWidth} / ${frameHeight}`;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -269,12 +269,24 @@ export default function PhotoBooth() {
         }
     };
 
+    const handleTouchStart = e => {
+        if (!e.touches || !e.touches.length) return;
+        handleMouseDown(e.touches[0]);
+    };
+
+    const handleTouchMove = e => {
+        if (!e.touches || !e.touches.length) return;
+        if (draggingPhoto !== null || draggingSticker !== null) {
+            e.preventDefault();
+        }
+        handleMouseMove(e.touches[0]);
+    };
+
     const handleMouseUp = () => {
         setDraggingPhoto(null);
         setDraggingSticker(null);
     };
 
-    // add Sticker
     const addSticker = src => {
         const img = new Image();
         img.src = src;
@@ -282,7 +294,6 @@ export default function PhotoBooth() {
             setStickers(s => [...s, {img, x: 400, y: 100}]);
     };
 
-    // delete Sticker
     useEffect(() => {
         const handleKeyDown = e => {
             if (
@@ -299,7 +310,6 @@ export default function PhotoBooth() {
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [selectedSticker, mode]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    //download
 
     const downloadPhoto = () => {
         const a = document.createElement("a");
@@ -309,28 +319,197 @@ export default function PhotoBooth() {
     };
 
     return (
-        <div style={centerCol}>
+        <div className="pb-root">
+            <style>{`
+                .pb-root {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 20px;
+                    width: 100%;
+                    box-sizing: border-box;
+                    padding: 12px;
+                }
+                .pb-root * { box-sizing: border-box; }
+
+                .pb-topbar {
+                    width: 100%;
+                    max-width: 700px;
+                    position: relative;
+                    margin-bottom: 4px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-height: 44px;
+                }
+                .pb-title {
+                    margin: 0;
+                    text-align: center;
+                    width: 100%;
+                    font-size: clamp(16px, 4vw, 24px);
+                    line-height: 1.4;
+                    padding: 0 8px;
+                }
+                .pb-back-btn {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    height: 40px;
+                    padding: 0 16px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    white-space: nowrap;
+                }
+
+                .pb-main {
+                    width: 100%;
+                    max-width: 700px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: flex-start;
+                }
+
+                .pb-frame-picker {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 24px;
+                    justify-content: center;
+                    width: 100%;
+                }
+                .pb-frame-thumb {
+                    width: clamp(120px, 40vw, 180px);
+                    height: auto;
+                    cursor: pointer;
+                    border-radius: 12px;
+                    box-shadow: 0 8px 8px rgba(0,0,0,0.15);
+                    transition: transform 0.25s ease, box-shadow 0.25s ease;
+                }
+                .pb-frame-thumb:hover {
+                    transform: scale(1.08);
+                    box-shadow: 0 12px 30px rgba(255,122,162,0.45);
+                }
+                .pb-frame-thumb.selected {
+                    transform: scale(1.08);
+                    box-shadow: 0 12px 30px rgba(255,122,162,0.45);
+                }
+
+                .pb-row {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 32px;
+                    align-items: flex-start;
+                    justify-content: center;
+                    width: 100%;
+                }
+                .pb-controls {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    width: 100%;
+                    max-width: 400px;
+                }
+                .pb-webcam-wrap {
+                    position: relative;
+                    width: 100%;
+                }
+                .pb-webcam-wrap video {
+                    width: 100%;
+                    border-radius: 12px;
+                    display: block;
+                }
+                .pb-countdown {
+                    position: absolute;
+                    inset: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: clamp(48px, 15vw, 96px);
+                    font-weight: bold;
+                    color: white;
+                    text-shadow: 0 4px 20px rgba(0,0,0,0.6);
+                    background: rgba(0,0,0,0.25);
+                    border-radius: 12px;
+                    pointer-events: none;
+                }
+                .pb-btn-row {
+                    margin-top: 16px;
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 12px;
+                    justify-content: center;
+                    width: 100%;
+                }
+                .pb-sticker-picker {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 12px;
+                    justify-content: center;
+                }
+                .pb-sticker-thumb {
+                    width: clamp(40px, 12vw, 50px);
+                    cursor: pointer;
+                }
+
+                .pb-canvas-col {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    width: 100%;
+                    max-width: 260px;
+                }
+                .pb-canvas {
+                    width: 100%;
+                    max-width: 260px;
+                    height: auto;
+                    border-radius: 16px;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+                    touch-action: none;
+                }
+                .pb-download-row {
+                    margin-top: 16px;
+                    display: flex;
+                    justify-content: center;
+                    width: 100%;
+                }
+
+                .pb-btn {
+                    font-famaily: Cantika Cute Handwriting;
+                    padding: 10px 20px;
+                    font-size: clamp(15px, 3.5vw, 20px);
+                    cursor: pointer;
+                    font-family: CantikaCute, inherit;
+                    color: #8c5b4a;
+                    border: 2px solid #8c5b4a;
+                    border-radius: 8px;
+                    background: white;
+                }
+                .pb-btn-redo {
+                    font-size: 22px;
+                    padding: 4px 10px;
+                }
+                .pb-btn-upload {
+                    cursor: pointer;
+                }
+
+                @media (max-width: 560px) {
+                    .pb-root { padding: 8px; gap: 14px; }
+                    .pb-back-btn { padding: 0 10px; height: 34px; font-size: 14px; }
+                    .pb-row { gap: 20px; }
+                    .pb-canvas-col { max-width: 220px; }
+                    .pb-canvas { max-width: 220px; }
+                }
+            `}</style>
+
             {/* top bar with back btn and text */}
-            <div style={topBar}>
+            <div className="pb-topbar">
                 {selectedFrame && (
-                    <button
-                        style={{
-                            ...buttonStyle,
-                            position: "absolute",
-                            left: 0,
-                            top: 10,
-                            height: 40,
-                            padding: "0 16px",
-                            lineHeight: "40px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                        }}
-                    onClick={handleBack}
-                    > ← Back</button>
+                    <button className="pb-btn pb-back-btn" onClick={handleBack}>
+                        ← Back
+                    </button>
                 )}
 
-                <h1 style={titleBar}>
+                <h1 className="pb-title">
                     {!selectedFrame
                         ? "(๑´• .̫ •ू`๑) Choose your frame!"
                         : mode === "photo"
@@ -339,9 +518,9 @@ export default function PhotoBooth() {
 
                 </h1>
             </div>
-            <div style={mainContent} >
+            <div className="pb-main">
                 {!selectedFrame ? (
-                    <div style={{ display: "flex", gap: 24 }}>
+                    <div className="pb-frame-picker">
                         {frameOptions.map((src) => {
                             const isSelected = selectedFrame === src;
 
@@ -351,32 +530,17 @@ export default function PhotoBooth() {
                                     src={src}
                                     alt="frame"
                                     onClick={() => setSelectedFrame(src)}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.transform = "scale(1.08)";
-                                        e.currentTarget.style.boxShadow = "0 12px 30px rgba(255,122,162,0.45)";
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.transform = "scale(1)";
-                                        e.currentTarget.style.boxShadow = frameThumb.boxShadow;
-
-                                    }}
-                                    style={{
-                                        ...frameThumb,
-                                        transform: isSelected ? "scale(1.08)" : "scale(1)",
-                                        transition: "transform 0.25s ease, box-shadow 0.25s ease",
-                                        boxShadow: isSelected ? "0 12px 30px rgba(255,122,162,0.45)" : frameThumb.boxShadow,
-                                    }}
-
+                                    className={`pb-frame-thumb${isSelected ? " selected" : ""}`}
                                 />
                             )
                         })}
                     </div>
                 ) : (
-                    <div style={row}>
-                        <div>
+                    <div className="pb-row">
+                        <div className="pb-controls">
                             {mode === "photo" && (
                                 <>
-                                    <div style= {{position: "relative", width: 400 }}>
+                                    <div className="pb-webcam-wrap">
                                         {/* Webcam */}
                                         <Webcam
                                             audio={false}
@@ -384,44 +548,29 @@ export default function PhotoBooth() {
                                             screenshotFormat="image/png"
                                             videoConstraints = {videoConstraints}
                                             mirrored = {true}
-                                            style={{ width: "100%", borderRadius: 12}}
                                             />
 
                                         {/* Overlay countdown */}
 
                                         {countdown != null && (
-                                            <div style = {{
-                                                position: "absolute",
-                                                inset: 0,
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                                fontSize: 96,
-                                                fontWeight: "bold",
-                                                color: "white",
-                                                textShadow: "0 4px 20px rgba(0,0,0,0.6)",
-                                                background: "rgba(0,0,0,0.25)",
-                                                borderRadius: 12,
-                                                pointerEvents: "none",
-                                            }}
-                                            >
+                                            <div className="pb-countdown">
                                                 {countdown}
                                                 </div>
                                         )}
                                     </div>
 
                                     {/* Buttons */}
-                                    <div style = {{marginTop: 16, display: "flex", gap:12}}>
+                                    <div className="pb-btn-row">
                                         {canTakePhoto && (
                                             <>
-                                                <button style={buttonStyle} onClick={capturePhoto}>
+                                                <button className="pb-btn" onClick={capturePhoto}>
                                                     Take Photo
                                                 </button>
-                                                <label style={{...buttonStyle, cursor: "pointer"}}>
+                                                <label className="pb-btn pb-btn-upload">
                                                     Upload
                                                     <input
                                                         type="file"
-                                                        accept="image /*"
+                                                        accept="image/*"
                                                         onChange={uploadPhoto}
                                                         style={{ display: "none"}}
                                                         />
@@ -430,12 +579,9 @@ export default function PhotoBooth() {
                                         )}
                                         {/* redo btn */}
                                         {photoCount > 0 && (
-                                            <button style={{
-                                                ...buttonStyle,
-                                                fontSize: 22,
-                                                padding: "4px 10px"
-                                            }}
-                                            onClick = {redoLastPhoto}
+                                            <button
+                                                className="pb-btn pb-btn-redo"
+                                                onClick = {redoLastPhoto}
                                             >
                                                 ⟳
                                             </button>
@@ -446,40 +592,38 @@ export default function PhotoBooth() {
                             )}
 
                             {mode === "decorate" && (
-                                stickerOptions.map((src) => (
-                                    <img
-                                        key={src}
-                                        src={src}
-                                        alt="sticker"
-                                        onClick={() => addSticker(src)}
-                                        style={{ width: 50, cursor: "pointer"}}
-                                    />
-                                ))
+                                <div className="pb-sticker-picker">
+                                    {stickerOptions.map((src) => (
+                                        <img
+                                            key={src}
+                                            src={src}
+                                            alt="sticker"
+                                            onClick={() => addSticker(src)}
+                                            className="pb-sticker-thumb"
+                                        />
+                                    ))}
+                                </div>
                             )
                             }
                         </div>
 
                         {/* Display frame */}
-                            <div>
-                                <canvas ref={canvasRef}
-                                style={{
-                                    width: 200,
-                                    height: 500,
-                                    borderRadius: 16,
-                                    boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
-                                }}
-                                onMouseDown={handleMouseDown}
-                                onMouseMove={handleMouseMove}
-                                onMouseUp={handleMouseUp}
+                            <div className="pb-canvas-col">
+                                <canvas
+                                    ref={canvasRef}
+                                    className="pb-canvas"
+                                    onMouseDown={handleMouseDown}
+                                    onMouseMove={handleMouseMove}
+                                    onMouseUp={handleMouseUp}
+                                    onMouseLeave={handleMouseUp}
+                                    onTouchStart={handleTouchStart}
+                                    onTouchMove={handleTouchMove}
+                                    onTouchEnd={handleMouseUp}
                                 />
 
                                 {mode === "decorate" && (
-                                <div style={{
-                                    marginTop: 16,
-                                    display:"flex",
-                                    justifyContent: "center",
-                                }}>
-                                    <button style={buttonStyle} onClick={downloadPhoto}>
+                                <div className="pb-download-row">
+                                    <button className="pb-btn" onClick={downloadPhoto}>
                                         Download
                                     </button>
                                 </div>
@@ -491,54 +635,4 @@ export default function PhotoBooth() {
             </div>
         </div>
     )
-}
-
-// styles
-const centerCol = {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: 20
-};
-const topBar = {
-    width: 700,
-    height: 60,
-    position: "relative",
-    marginBottom: 20,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-}
-const buttonStyle = {
-    padding: "10px 20px",
-    fontSize: 20,
-    cursor: "pointer",
-    fontFamily: "CantikaCute",
-    color: "#8c5b4a",
-    border: "2px solid #8c5b4a",
-    borderRadius: 8,
-    background: "white"
-};
-
-const row = { display: "flex", gap: 40, alignItems: "flex-start" };
-const frameThumb = {
-    width: 180,
-    cursor: "pointer",
-    borderRadius: 12,
-    boxShadow: "0 8px 8px rgba(0,0,0,0.15)"
-};
-
-const titleBar = {
-    margin: 0,
-    lineHeight: "60px",      // vertical center
-    textAlign: "center",     // horizontal center
-    width: "100%",            // occupy full width of top bar
-}
-
-const mainContent = {
-    height: 600, // fixed content height
-    width: 700,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "flex-start",
 }
