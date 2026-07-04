@@ -346,7 +346,7 @@ export default function PhotoBooth() {
                     margin: 0;
                     text-align: center;
                     width: 100%;
-                    font-size: clamp(16px, 4vw, 24px);
+                    font-size: clamp(26px, 7vw, 40px);
                     line-height: 1.4;
                     padding: 0 8px;
                 }
@@ -513,7 +513,7 @@ export default function PhotoBooth() {
                     {!selectedFrame
                         ? "(๑´• .̫ •ू`๑) Choose your frame!"
                         : mode === "photo"
-                            ? "(｡・//ε//・｡) Cheeeseee"
+                            ? "Cheeeseee"
                             : "Add some sticekrs (´• ω •`) ♡"}
 
                 </h1>

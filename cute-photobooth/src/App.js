@@ -25,9 +25,10 @@ function App() {
         <h1 style={{
           fontFamily: "CantikaCute",
           color: "#8c5b4a",
-          margin: 0
+          margin: 0,
+          fontSize: "clamp(20px, 5vw, 32px)"
         }}>
-          Nya Photobooth
+          Nya Photobooth!!!
         </h1>
       </div>
 
