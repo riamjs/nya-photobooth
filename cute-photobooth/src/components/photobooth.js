@@ -14,18 +14,19 @@ const videoConstraints = { width: 953, height: 599, facingMode: "user" };
 const SLOT_WIDTH = 648;
 const SLOT_HEIGHT = 378;
 
-
-export default function PhotoBooth() {
-    const webcamRef = useRef(null);
-    const canvasRef = useRef(null);
-    const frameImgRef = useRef(null);
-
-    const slots = [
+ const slots = [
     { x: 84, y: 59 },
     { x: 83, y: 467 },
     { x: 85, y: 878 },
     { x: 87, y: 1293 },
     ];
+    
+export default function PhotoBooth() {
+    const webcamRef = useRef(null);
+    const canvasRef = useRef(null);
+    const frameImgRef = useRef(null);
+
+   
 
     const [selectedFrame, setSelectedFrame] = useState(null);
     const [mode, setMode] = useState("photo");
